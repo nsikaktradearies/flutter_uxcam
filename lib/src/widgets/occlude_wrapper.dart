@@ -22,10 +22,11 @@ class _OccludeWrapperState extends State<OccludeWrapper> {
   late OccludePoint occludePoint;
   final GlobalKey _widgetKey = GlobalKey();
   bool enableOcclusion = true;
+  Timer? occlusionTimer;
 
   @override
   void initState() {
-    Timer.periodic(const Duration(milliseconds: 50), (_) {
+   occlusionTimer = Timer.periodic(const Duration(milliseconds: 20), (_) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         if (enableOcclusion) {
           getOccludePoints();
@@ -33,6 +34,12 @@ class _OccludeWrapperState extends State<OccludeWrapper> {
       });
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    occlusionTimer?.cancel();
+    super.dispose();
   }
 
   @override
