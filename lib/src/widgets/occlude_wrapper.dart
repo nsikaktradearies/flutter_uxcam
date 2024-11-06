@@ -25,10 +25,12 @@ class _OccludeWrapperState extends State<OccludeWrapper> {
 
   @override
   void initState() {
-    Timer.periodic(const Duration(milliseconds: 10), (_) {
-      if (enableOcclusion) {
-        getOccludePoints();
-      }
+    Timer.periodic(const Duration(milliseconds: 50), (_) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        if (enableOcclusion) {
+          getOccludePoints();
+        }
+      });
     });
     super.initState();
   }
@@ -55,7 +57,7 @@ class _OccludeWrapperState extends State<OccludeWrapper> {
     // Preventing Extra Operation
     if (!mounted) return;
 
-    Rect? bound = _widgetKey.globalPaintBounds;
+    Rect? bound = _widgetKey.getBounds();
 
     if (bound == null) return;
 
@@ -76,6 +78,21 @@ class _OccludeWrapperState extends State<OccludeWrapper> {
 }
 
 extension GlobalKeyExtension on GlobalKey {
+  Rect? getBounds() {
+    final RenderBox? renderBox =
+        this.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null) return null;
+    final Offset position = renderBox.localToGlobal(Offset.zero);
+    final Size size = renderBox.size;
+
+    return Rect.fromLTWH(
+      position.dx,
+      position.dy,
+      size.width,
+      size.height,
+    );
+  }
+
   Rect? get globalPaintBounds {
     final renderObject = currentContext?.findRenderObject();
     final translation = renderObject?.getTransformTo(null).getTranslation();
