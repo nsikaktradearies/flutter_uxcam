@@ -31,7 +31,7 @@ class _OccludeWrapperState extends State<OccludeWrapper>
       if (enableOcclusion) {
         getOccludePoints();
       }
-    });
+    })..start();
     super.initState();
   }
 
