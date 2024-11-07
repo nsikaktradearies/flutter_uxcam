@@ -1,8 +1,8 @@
-import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_uxcam/src/flutter_uxcam.dart';
 import 'package:flutter_uxcam/src/helpers/screen_lifecycle.dart';
 
@@ -18,19 +18,27 @@ class OccludeWrapper extends StatefulWidget {
   State<OccludeWrapper> createState() => _OccludeWrapperState();
 }
 
-class _OccludeWrapperState extends State<OccludeWrapper> {
+class _OccludeWrapperState extends State<OccludeWrapper>
+    with SingleTickerProviderStateMixin {
   late OccludePoint occludePoint;
   final GlobalKey _widgetKey = GlobalKey();
   bool enableOcclusion = true;
+  Ticker? occlusionTicker;
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPersistentFrameCallback((timeStamp) {
+    occlusionTicker = createTicker((duration) {
       if (enableOcclusion) {
         getOccludePoints();
       }
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    occlusionTicker?.dispose();
+    super.dispose();
   }
 
   @override
